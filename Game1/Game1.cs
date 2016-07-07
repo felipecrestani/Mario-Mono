@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -11,6 +12,15 @@ namespace Game1
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Rectangle mario, life, goomba;
+        Point mario_position, life_position, goomba_position;
+        bool jump;
+        string mario_direction = "right";
+        string goomba_direction = "right";
+        public int mario_life = 1;
+        string hud;
+        SoundEffect jump_sound, kick_sound, mario_theme;
+        SpriteFont UVfont;
 
         public Game1()
         {
@@ -28,6 +38,17 @@ namespace Game1
         {
             // TODO: Add your initialization logic here
 
+            mario = new Rectangle(0, 0, 48, 92);
+            mario_position = new Point(0, 385);
+            mario_direction = "left";
+
+            life = new Rectangle(0, 0, 48, 48);
+            life_position = new Point(300, 315);
+
+            goomba = new Rectangle(0, 0, 40, 42);
+            goomba_position = new Point(500, 435);
+            goomba_direction = "right";
+
             base.Initialize();
         }
 
@@ -39,6 +60,13 @@ namespace Game1
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatch = new SpriteBatch(this.graphics.GraphicsDevice);
+            UVfont = Content.Load<SpriteFont>("SpriteFont1");
+
+            jump_sound = this.Content.Load<SoundEffect>("jump");
+            kick_sound = this.Content.Load<SoundEffect>("kick");
+            mario_theme = this.Content.Load<SoundEffect>("mario theme");
+            mario_theme.Play();
 
             // TODO: use this.Content to load your game content here
         }
@@ -59,10 +87,91 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            // Allows the game to exit
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                this.Exit();
 
-            // TODO: Add your update logic here
+            mario.Y = mario_position.Y;
+            mario.X = mario_position.X;
+
+            life.Y = life_position.Y;
+            life.X = life_position.X;
+
+            goomba.Y = goomba_position.Y;
+            goomba.X = goomba_position.X;
+
+
+            hud = "Life: " + mario_life;
+
+            Window.Title = "X:" + mario_position.X + " Y:" + mario_position.Y;
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                mario_position.X += 3;
+                mario_direction = "right";
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                mario_position.X -= 3;
+                mario_direction = "left";
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Space))
+            {
+                if (!jump)
+                    if (mario_position.Y == 385)
+                    {
+                        jump = true;
+                        jump_sound.Play();
+                    }
+            }
+
+
+            //Mario Jump
+            if (jump)
+            {
+                if (mario_position.Y > 340)
+                    mario_position.Y--;
+
+                if (mario_position.Y == 340)
+                    jump = false;
+            }
+            else
+            {
+                if (mario_position.Y <= 384)
+                    mario_position.Y++;
+            }
+
+            if (mario.Intersects(life))
+            {
+                mario_life++;
+                life_position.Y = 999;
+            }
+
+            //Goomba walk
+            if (goomba_direction.Equals("right"))
+            {
+                if (goomba_position.X >= 300)
+                    goomba_position.X--;
+                if (goomba_position.X == 300)
+                    goomba_direction = "left";
+            }
+            if (goomba_direction.Equals("left"))
+            {
+                if (goomba_position.X < 500)
+                    goomba_position.X++;
+                if (goomba_position.X == 500)
+                    goomba_direction = "right";
+            }
+
+            //Mario x Goomba
+
+            if (mario.Intersects(goomba))
+            {
+                goomba_position.Y = 999;
+                kick_sound.Play();
+            }
 
             base.Update(gameTime);
         }
@@ -73,9 +182,26 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            if (mario_direction == "right")
+            {
+                spriteBatch.Draw(Content.Load<Texture2D>("mario"), mario, Color.White);
+            }
+            else if (mario_direction == "left")
+            {
+                spriteBatch.Draw(Content.Load<Texture2D>("mario2"), mario, Color.White);
+            }
+
+            spriteBatch.DrawString(UVfont, hud, Vector2.Zero, Color.Black);
+
+            spriteBatch.Draw(Content.Load<Texture2D>("life"), life, Color.White);
+
+            spriteBatch.Draw(Content.Load<Texture2D>("goomba"), goomba, Color.White);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
