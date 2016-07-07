@@ -1,7 +1,7 @@
 # MarioMono
 Mario in MonoGame
 
-/nVisual Studio 2015
-/nMonoGame - http://www.monogame.net/
-/nF5 and Smile :)
+-Visual Studio 2015
+-MonoGame - http://www.monogame.net/
+-F5 and Smile :)
 
