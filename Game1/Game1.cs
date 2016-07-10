@@ -14,9 +14,8 @@ namespace Game1
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Rectangle life;
-        Point life_position;
         string hud;
-        SoundEffect jump_sound, kick_sound, mario_theme;
+        SoundEffect jump_sound, kick_sound, mario_theme, life_sound, finish_sound;
         SpriteFont Font;
         Texture2D background;
         private Mario Mario;
@@ -39,10 +38,7 @@ namespace Game1
         {
             Mario = new Mario();
             Goomba = new Goomba();
-
-            life = new Rectangle(0, 0, 48, 48);
-            life_position = new Point(300, 315);            
-
+            life = new Rectangle(300, 230, 48, 48);      
             base.Initialize();
         }
 
@@ -60,6 +56,8 @@ namespace Game1
 
             jump_sound = this.Content.Load<SoundEffect>("jump");
             kick_sound = this.Content.Load<SoundEffect>("kick");
+            life_sound = this.Content.Load<SoundEffect>("1up");
+            finish_sound = this.Content.Load<SoundEffect>("courseclear");
 
             mario_theme = this.Content.Load<SoundEffect>("mario theme");            
 
@@ -82,9 +80,9 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            hud = $"Life {Mario.Life}";
+
+            Window.Title = "X:" + Mario.Person.X + " Y:" + Mario.Person.Y;
 
             if(currentState == GameState.Menu)
             {
@@ -95,57 +93,62 @@ namespace Game1
                 }
             }
 
-            hud = $"Life {Mario.Life}";
-
-            life.Y = life_position.Y;
-            life.X = life_position.X;
-
-            Window.Title = "X:" + Mario.Person.X + " Y:" + Mario.Person.Y;
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            if (currentState == GameState.Playing)
             {
-                Mario.Direction = Side.Right;
-                Mario.Move();
-            }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
-            {
-                Mario.Direction = Side.Left;
-                Mario.Move();
-            }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                if (Mario.Person.Y == Mario.MARIO_INITIAL_Y_POSITION)
+                if (Keyboard.GetState().IsKeyDown(Keys.Right))
                 {
-                    Mario.IsJump = true;
-                    jump_sound.Play();
-                }                
+                    Mario.Direction = Side.Right;
+                    Mario.Move();
+                }
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                {
+                    Mario.Direction = Side.Left;
+                    Mario.Move();
+                }
+
+                if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                {
+                    if (Mario.Person.Y == Mario.MARIO_INITIAL_Y_POSITION)
+                    {
+                        Mario.IsJump = true;
+                        jump_sound.Play();
+                    }
+                }
+
+                if (Mario.IsJump)
+                {
+                    Mario.Jump();
+                }
+
+                if (Mario.Person.Intersects(life))
+                {
+                    life_sound.Play();
+                    Mario.Life++;
+                    life.Y = 999;
+                }
+
+                //Goomba walk
+                Goomba.Walk();
+
+                //Mario x Goomba
+                if (Mario.Person.Intersects(Goomba.Person))
+                {
+                    Goomba.Person.Y = 999;
+                    kick_sound.Play();
+                }
             }
 
-            if (Mario.IsJump)
-            {
-                Mario.Jump();
-            }
-
-            if (Mario.Person.Intersects(life))
-            {
-                Mario.Life++;
-                life_position.Y = 999;
-            }
-
-            //Goomba walk
-            Goomba.Walk();
-
-            //Mario x Goomba
-            if (Mario.Person.Intersects(Goomba.Person))
-            {
-                Goomba.Person.Y = 999;
-                kick_sound.Play();
-            }
-
+            //Game Over
             if (Mario.Life == 2 && Mario.Person.X == 750)
-                currentState = GameState.GameOver;
+            {
+                if (currentState == GameState.Playing)
+                    finish_sound.Play();
+
+                currentState = GameState.GameOver;                
+            }
 
             base.Update(gameTime);
         }

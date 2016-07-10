@@ -121,3 +121,15 @@
 /processorParam:TextureFormat=Color
 /build:life.png
 
+#begin 1up.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:1up.wav
+
+#begin courseclear.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:courseclear.wav
+

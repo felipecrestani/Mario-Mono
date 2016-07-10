@@ -10,13 +10,11 @@ namespace Game1.Model
     public class Goomba
     {
         public Rectangle Person;
-        public Point Position;
         public Side Direction { get; set; }
         public const int GOOMBA_INITIAL_Y_POSITION = 380;
 
         public Goomba()
         {
-            this.Position = new Point(500, GOOMBA_INITIAL_Y_POSITION);
             this.Person = new Rectangle(500, GOOMBA_INITIAL_Y_POSITION, 40, 42);
             this.Direction = Side.Right;
         }
