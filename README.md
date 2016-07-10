@@ -1,5 +1,5 @@
 # MarioMono
-Mario in MonoGame
+Mario made with MonoGame
 
 Visual Studio 2015
 
