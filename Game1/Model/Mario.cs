@@ -7,7 +7,6 @@ namespace Game1.Model
         public Rectangle Person;
         public Point Position;
         public Side Direction { get; set; }
-        public int MyProperty { get; set; }
         public bool IsJump{ get; set; }
         public bool HighJump { get; set; }
         public int Life { get; set; }

@@ -12,27 +12,29 @@ namespace Game1.Model
         public Rectangle Person;
         public Side Direction { get; set; }
         public const int GOOMBA_INITIAL_Y_POSITION = 380;
+        public int InitialXPosition { get; set; }
+        private int RandomMove { get; set; }
 
-        public Goomba()
+        public Goomba(int x)
         {
-            this.Person = new Rectangle(500, GOOMBA_INITIAL_Y_POSITION, 40, 42);
+            this.InitialXPosition = x;
+            this.Person = new Rectangle(x, GOOMBA_INITIAL_Y_POSITION, 40, 42);
             this.Direction = Side.Right;
+            this.RandomMove = new Random().Next(100, 200);
         }
 
         public void Walk()
         {
             if (Direction == Side.Left)
             {
-                if (Person.X >= 300)
-                    Person.X -= 4;
-                if (Person.X == 300)
+                Person.X -= 4;
+                if (Person.X <= InitialXPosition - RandomMove)
                     Direction = Side.Right;
             }
             if (Direction == Side.Right)
             {
-                if (Person.X < 500)
-                    Person.X += 4;
-                if (Person.X == 500)
+                Person.X += 4;
+                if (Person.X >= InitialXPosition + RandomMove)
                     Direction = Side.Left;
             }
         }

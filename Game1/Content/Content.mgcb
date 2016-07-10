@@ -133,3 +133,9 @@
 /processorParam:Quality=Best
 /build:courseclear.wav
 
+#begin mariodie.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:mariodie.wav
+

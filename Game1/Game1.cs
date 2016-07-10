@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace Game1
 {
@@ -15,17 +16,20 @@ namespace Game1
         SpriteBatch spriteBatch;
         Rectangle life;
         string hud;
-        SoundEffect jump_sound, kick_sound, mario_theme, life_sound, finish_sound;
+        SoundEffect jump_sound, kick_sound, mario_theme, life_sound, finish_sound, mariodie_sound;
         SpriteFont Font;
         Texture2D background;
         private Mario Mario;
         private Goomba Goomba;
+        private Goomba Goomba2;
         GameState currentState = GameState.Menu;
+        private Random random;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            random = new Random();
         }
 
         /// <summary>
@@ -37,7 +41,8 @@ namespace Game1
         protected override void Initialize()
         {
             Mario = new Mario();
-            Goomba = new Goomba();
+            Goomba = new Goomba(random.Next(100, 800));
+            Goomba2 = new Goomba(random.Next(100,800));
             life = new Rectangle(300, 230, 48, 48);      
             base.Initialize();
         }
@@ -57,6 +62,7 @@ namespace Game1
             jump_sound = this.Content.Load<SoundEffect>("jump");
             kick_sound = this.Content.Load<SoundEffect>("kick");
             life_sound = this.Content.Load<SoundEffect>("1up");
+            mariodie_sound = this.Content.Load<SoundEffect>("mariodie");
             finish_sound = this.Content.Load<SoundEffect>("courseclear");
 
             mario_theme = this.Content.Load<SoundEffect>("mario theme");            
@@ -130,13 +136,11 @@ namespace Game1
 
                 //Goomba walk
                 Goomba.Walk();
+                Goomba2.Walk();
 
-                //Mario x Goomba
-                if (Mario.Person.Intersects(Goomba.Person))
-                {
-                    Goomba.Person.Y = 999;
-                    kick_sound.Play();
-                }
+                MarioIntersects(Goomba.Person);
+                MarioIntersects(Goomba2.Person);
+                
             }
 
             //Game Over
@@ -159,12 +163,29 @@ namespace Game1
             base.Update(gameTime);
         }
 
+        private void MarioIntersects(Rectangle target)
+        {
+            if (Mario.Person.Intersects(target))
+            {
+                if (Mario.IsJump)
+                {
+                    target.Y = 999;
+                    kick_sound.Play();
+                }
+                else
+                {
+                    Mario.Life--;
+                }
+            }
+        }
+
         private void RestartGame()
         {
             finish_sound.Dispose();
             currentState = GameState.Menu;
             Mario = new Mario();
-            Goomba = new Goomba();
+            Goomba = new Goomba(random.Next(100,600));
+            Goomba2 = new Goomba(random.Next(300, 800));
             life = new Rectangle(300, 230, 48, 48);
         }
 
@@ -213,6 +234,8 @@ namespace Game1
                 spriteBatch.Draw(Content.Load<Texture2D>("life"), life, Color.White);
 
                 spriteBatch.Draw(Content.Load<Texture2D>("goomba"), Goomba.Person, Color.White);
+
+                spriteBatch.Draw(Content.Load<Texture2D>("goomba"), Goomba2.Person, Color.White);
 
                 spriteBatch.DrawString(Font, hud, Vector2.Zero, Color.Black);
             }
