@@ -134,13 +134,12 @@ namespace Game1
                     life.Y = 999;
                 }
 
+                MarioIntersects(ref Goomba.Person);
+                MarioIntersects(ref Goomba2.Person);
+
                 //Goomba walk
                 Goomba.Walk();
-                Goomba2.Walk();
-
-                MarioIntersects(Goomba.Person);
-                MarioIntersects(Goomba2.Person);
-                
+                Goomba2.Walk();                
             }
 
             //Game Over
@@ -163,7 +162,7 @@ namespace Game1
             base.Update(gameTime);
         }
 
-        private void MarioIntersects(Rectangle target)
+        private void MarioIntersects(ref Rectangle target)
         {
             if (Mario.Person.Intersects(target))
             {
