@@ -79,12 +79,6 @@
 /processorParam:TextureFormat=Color
 /build:mario2.bmp
 
-#begin SpriteFont1.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:SpriteFont1.spritefont
-
 #begin mariodownL.bmp
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -108,4 +102,22 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mariodownR.bmp
+
+#begin Font.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Font.spritefont
+
+#begin background.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:background.png
 

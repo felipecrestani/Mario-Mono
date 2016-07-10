@@ -9,13 +9,16 @@ namespace Game1.Model
         public Side Direction { get; set; }
         public int MyProperty { get; set; }
         public bool IsJump{ get; set; }
+        public bool HighJump { get; set; }
         public int Life { get; set; }
+        public const int MARIO_INITIAL_X_POSITION = 330;
+        public const int MARIO_JUMP_SIZE = 250;
 
         public Mario()
         {
             this.Life = 1;
-            this.Position = new Point(0, 385);
-            this.Person = new Rectangle(0, 385, 48, 92);
+            this.Position = new Point(0, MARIO_INITIAL_X_POSITION);
+            this.Person = new Rectangle(0, MARIO_INITIAL_X_POSITION, 48, 92);
             this.Direction = Side.Left;
         }
 
@@ -23,37 +26,35 @@ namespace Game1.Model
         {
             if (Direction == Side.Left)
             {
-                Position.X -= 3;
-                Person.X = Position.X;
-                Person.Y = Position.Y;
+                Person.X -= 3;
                 Direction = Side.Left;
             }
             
             if (Direction == Side.Right)
             {
-                Position.X += 3;
-                Person.X = Position.X;
-                Person.Y = Position.Y;
+                Person.X += 3;
                 Direction = Side.Right;
             }
         }
 
         public void Jump()
         {
-            IsJump = true;
+            if (Person.Y > MARIO_JUMP_SIZE && !HighJump)
+                Person.Y -= 3;
 
-            if (IsJump)
+            if(Person.Y <= MARIO_JUMP_SIZE)
             {
-                if (Position.Y > 340)
-                    Position.Y -= 3;
-
-                if (Position.Y == 340)
-                    IsJump = false;
+                HighJump = true;
             }
-            else
+
+            if (HighJump)
             {
-                if (Position.Y <= 384)
-                    Position.Y += 3;
+                Person.Y += 3;
+                if (Person.Y == MARIO_INITIAL_X_POSITION)
+                {
+                    IsJump = false;
+                    HighJump = false;
+                }
             }
         }
 

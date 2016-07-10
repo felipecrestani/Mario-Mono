@@ -17,7 +17,8 @@ namespace Game1
         Point life_position, goomba_position;
         string hud, goomba_direction;
         SoundEffect jump_sound, kick_sound, mario_theme;
-        SpriteFont UVfont;
+        SpriteFont Font;
+        Texture2D background;
         private Mario Mario;
 
         public Game1()
@@ -54,8 +55,9 @@ namespace Game1
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            spriteBatch = new SpriteBatch(this.graphics.GraphicsDevice);
-            UVfont = Content.Load<SpriteFont>("SpriteFont1");
+
+            Font = Content.Load<SpriteFont>("Font");
+            background = this.Content.Load<Texture2D>(@"background");
 
             jump_sound = this.Content.Load<SoundEffect>("jump");
             kick_sound = this.Content.Load<SoundEffect>("kick");
@@ -83,7 +85,9 @@ namespace Game1
         {
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit(); 
+                this.Exit();
+
+            hud = $"X {Mario.Person.X} - Y {Mario.Person.Y}";
 
             life.Y = life_position.Y;
             life.X = life_position.X;
@@ -91,9 +95,7 @@ namespace Game1
             goomba.Y = goomba_position.Y;
             goomba.X = goomba_position.X;
 
-            hud = "Life: " + Mario.Life;
-
-            Window.Title = "X:" + Mario.Position.X + " Y:" + Mario.Position.Y;
+            Window.Title = "X:" + Mario.Person.X + " Y:" + Mario.Person.Y;
 
             if (Keyboard.GetState().IsKeyDown(Keys.Right))
             {
@@ -109,16 +111,16 @@ namespace Game1
 
             if (Keyboard.GetState().IsKeyDown(Keys.Space))
             {
-                Mario.Jump();
-
-                if (Mario.IsJump)
+                if (Mario.Person.Y == Mario.MARIO_INITIAL_X_POSITION)
                 {
-                    if (Mario.Position.Y == 385)
-                    {
-                        Mario.IsJump = true;
-                        jump_sound.Play();
-                    }
-                }
+                    Mario.IsJump = true;
+                    jump_sound.Play();
+                }                
+            }
+
+            if (Mario.IsJump)
+            {
+                Mario.Jump();
             }
 
             if (Mario.Person.Intersects(life))
@@ -150,6 +152,9 @@ namespace Game1
                 kick_sound.Play();
             }
 
+            if(Mario.Life == 2 && Mario.Person.X == 750)
+
+
             base.Update(gameTime);
         }
 
@@ -163,6 +168,8 @@ namespace Game1
 
             spriteBatch.Begin();
 
+            this.spriteBatch.Draw(background, new Rectangle(0, 0, 800, 500), Color.White);
+
             if (Mario.Direction == Side.Right)
             {
                 spriteBatch.Draw(Content.Load<Texture2D>("mario"), Mario.Person, Color.White);
@@ -172,11 +179,11 @@ namespace Game1
                 spriteBatch.Draw(Content.Load<Texture2D>("mario2"), Mario.Person, Color.White);
             }
 
-            spriteBatch.DrawString(UVfont, hud, Vector2.Zero, Color.Black);
-
             spriteBatch.Draw(Content.Load<Texture2D>("life"), life, Color.White);
 
             spriteBatch.Draw(Content.Load<Texture2D>("goomba"), goomba, Color.White);
+
+            spriteBatch.DrawString(Font, hud , Vector2.Zero, Color.Black);
 
             spriteBatch.End();
 
