@@ -95,8 +95,6 @@ namespace Game1
 
             if (currentState == GameState.Playing)
             {
-
-
                 if (Keyboard.GetState().IsKeyDown(Keys.Right))
                 {
                     Mario.Direction = Side.Right;
@@ -150,7 +148,24 @@ namespace Game1
                 currentState = GameState.GameOver;                
             }
 
+            if(currentState == GameState.GameOver)
+            {
+                if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+                {
+                    RestartGame();
+                }
+            }
+
             base.Update(gameTime);
+        }
+
+        private void RestartGame()
+        {
+            finish_sound.Dispose();
+            currentState = GameState.Menu;
+            Mario = new Mario();
+            Goomba = new Goomba();
+            life = new Rectangle(300, 230, 48, 48);
         }
 
         /// <summary>
