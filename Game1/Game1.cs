@@ -21,6 +21,7 @@ namespace Game1
         Texture2D background;
         private Mario Mario;
         private Goomba Goomba;
+        GameState currentState = GameState.Menu;
 
         public Game1()
         {
@@ -60,8 +61,7 @@ namespace Game1
             jump_sound = this.Content.Load<SoundEffect>("jump");
             kick_sound = this.Content.Load<SoundEffect>("kick");
 
-            mario_theme = this.Content.Load<SoundEffect>("mario theme");
-            mario_theme.Play();
+            mario_theme = this.Content.Load<SoundEffect>("mario theme");            
 
             // TODO: use this.Content to load your game content here
         }
@@ -85,6 +85,15 @@ namespace Game1
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
+
+            if(currentState == GameState.Menu)
+            {
+                if(Keyboard.GetState().GetPressedKeys().Length > 0)
+                {
+                    currentState = GameState.Playing;
+                    mario_theme.Play();
+                }
+            }
 
             hud = $"Life {Mario.Life}";
 
@@ -135,7 +144,8 @@ namespace Game1
                 kick_sound.Play();
             }
 
-            //if(Mario.Life == 2 && Mario.Person.X == 750)
+            if (Mario.Life == 2 && Mario.Person.X == 750)
+                currentState = GameState.GameOver;
 
             base.Update(gameTime);
         }
@@ -148,24 +158,46 @@ namespace Game1
         {
             GraphicsDevice.Clear(Color.White);
 
+            var center = graphics.GraphicsDevice.Viewport.Bounds.Center.ToVector2();
+
             spriteBatch.Begin();
 
             this.spriteBatch.Draw(background, new Rectangle(0, 0, 800, 500), Color.White);
 
-            if (Mario.Direction == Side.Right)
+            if(currentState == GameState.Menu)
             {
-                spriteBatch.Draw(Content.Load<Texture2D>("mario"), Mario.Person, Color.White);
-            }
-            else if (Mario.Direction == Side.Left)
-            {
-                spriteBatch.Draw(Content.Load<Texture2D>("mario2"), Mario.Person, Color.White);
+                var v = new Vector2(Font.MeasureString("Mario Mono!").X / 2, 0);
+                spriteBatch.DrawString(Font, "Mario Mono!", center - v, Color.Black);
             }
 
-            spriteBatch.Draw(Content.Load<Texture2D>("life"), life, Color.White);
 
-            spriteBatch.Draw(Content.Load<Texture2D>("goomba"), Goomba.Person, Color.White);
+            if (currentState == GameState.GameOver)
+            {
+                // Measure the text so we can center it correctly
+                var v = new Vector2(Font.MeasureString("Game Over").X / 2, 0);
+                spriteBatch.DrawString(Font, "GAME OVER", center - v, Color.Black);
+                mario_theme.Dispose();
+            }
 
-            spriteBatch.DrawString(Font, hud , Vector2.Zero, Color.Black);
+
+
+            if (currentState == GameState.Playing)
+            {
+                if (Mario.Direction == Side.Right)
+                {
+                    spriteBatch.Draw(Content.Load<Texture2D>("mario"), Mario.Person, Color.White);
+                }
+                else if (Mario.Direction == Side.Left)
+                {
+                    spriteBatch.Draw(Content.Load<Texture2D>("mario2"), Mario.Person, Color.White);
+                }
+
+                spriteBatch.Draw(Content.Load<Texture2D>("life"), life, Color.White);
+
+                spriteBatch.Draw(Content.Load<Texture2D>("goomba"), Goomba.Person, Color.White);
+
+                spriteBatch.DrawString(Font, hud, Vector2.Zero, Color.Black);
+            }
 
             spriteBatch.End();
 
